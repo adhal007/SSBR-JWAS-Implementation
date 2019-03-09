@@ -11,5 +11,6 @@ using JWAS.
 ## Functionalities
 1. XSimPreProcess Module Pre-processes XSim package's simulated phenotypic and genotypic data into a format compatible for JWAS package
 2. Generating training and testing sets in 70:30 ratio 
-3. 5 output files required for JWAS a) Phenotype b) Genotype c) Pedigree(if single step/optional) d)observation ID's (for EBV prediction) e) mapfile(for hypothesis testing)
-4. A python script to generate multiple folders for multiple simulations with XSim
+3. 5 processed output files required for JWAS a) Phenotype b) Genotype c) Pedigree(if single step/optional) d)observation ID's (for EBV prediction) e) mapfile(for hypothesis testing) in the Processed-Data folder
+4. 3 raw input files from XSim in the Data folder
+5. A python script to generate multiple folders for multiple simulations with XSim
