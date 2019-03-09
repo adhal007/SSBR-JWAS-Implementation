@@ -9,7 +9,7 @@ function geno_ssbr_format(genofile, rowIDs, n_markers)
 
 
     ## hcat rowIDs
-    geno_cat1 = Array{Any}(5881, n_markers+1);
+    geno_cat1 = Array{Any}(undef, 5881, n_markers+1);
     geno_cat1[2:5881, :] = hcat(rowIDs, geno_copy)
     println("genotype file concatenated with ID's: ", "a1, 1, 0, 2")
 
