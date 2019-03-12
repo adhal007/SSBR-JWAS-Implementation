@@ -5,7 +5,8 @@ For genomic estimated breeding value(EBV) and Genome wide association studies(GW
 3) Includes XSimPreProcess package for automating XSim -> JWAS analysis.
 
 ## Steps for adding XSimPreProcess Module for XSim package.
-1. push!(LOAD_PATH, "/Path/To/My/Module/") to add XSimPreProcess Module to julia. Requires this push for module use everytime julia is reopned
-2. Putting this statement in the file ~/.julia/config/startup.jl will extend LOAD_PATH on every Julia startup.
-3. Generate XSim Data for multiple generations and pre-process the data for use in SSBR for JWAS
+1. ```push!(LOAD_PATH, "/Path/To/My/Module/")``` to add XSimPreProcess Module to julia. Requires this push for module use everytime julia is reopned
+2. Copy/paste the command in the file ```~/.julia/config/startup.jl``` will extend LOAD_PATH on every Julia startup.
 
+## Jupyter-Examples.
+Usage of XSimPreProcess module for SSBR-analysis in this folder
