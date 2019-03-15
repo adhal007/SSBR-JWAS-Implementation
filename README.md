@@ -1,8 +1,9 @@
 # SSBR-JWAS-Implementation
 For genomic estimated breeding value(EBV) and Genome wide association studies(GWAS) using JWAS and XSim. The workflow includes 
-1) Simulating SNP data using XSim. Files generated: pedigree.txt, phenotype.txt, genotype.txt, map.txt and ID.txt 
-2) Statistical Analysis for EBV and GWAS using JWAS
-3) Includes XSimPreProcess package for automating XSim -> JWAS analysis.
+1) Simulating SNP data using XSim. Files generated: pedigree.txt, phenotype.txt, genotype.txt, map.txt and ID.txt <br/>
+2) Statistical Analysis for EBV and GWAS using JWAS <br/>
+3) Includes XSimPreProcess package for automating XSim -> JWAS analysis. <br/>
+4) To use GWAS function for WPPA in JWAS package run ```Pkg.add(PackageSpec(name=“JWAS”, rev=“master”))``` and then import JWAS.misc by ```using JWAS.misc ```
 
 ## Steps for adding XSimPreProcess Module for XSim package.
 1. ```push!(LOAD_PATH, "/Path/To/My/Module/")``` to add XSimPreProcess Module to julia. Requires this push for module use everytime julia is reopned
