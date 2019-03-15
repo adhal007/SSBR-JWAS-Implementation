@@ -1,5 +1,4 @@
 using Pkg
-
 function test_split(y::Vector{Float64}, g::Matrix{Int64}, ped::Matrix{Int64}, ratio1::Float64, ratio2::Float64)
     ## ratio1 is for training testing split
     ## ratio 2 is for NG:G split 
@@ -9,7 +8,7 @@ function test_split(y::Vector{Float64}, g::Matrix{Int64}, ped::Matrix{Int64}, ra
     rows_ng = convert(Int64, (ratio2)*rows_t);
     rows_g = convert(Int64, (1.0 - ratio2)*rows_t);
     rows_ng_tr = convert(Int64, (1.0 - ratio1)*rows_ng);
-    rows_g_tr = convert(Int64, (ratio1)*rows_ng);
+    rows_g_tr = convert(Int64, (1-0 - ratio1)*rows_ng);
     
     ## number of rows in each category 
     ## splitting works as such (1:rows_t) -> (1:rows_ng, rows_ng+1:rows_t) 

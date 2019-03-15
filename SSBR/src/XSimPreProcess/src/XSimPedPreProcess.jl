@@ -4,8 +4,8 @@ function ped_ssbr_convert_1(pedfile)
   ped_Array[1] = "ID,Sire,Dam";
   temp_arr = Array{String}(undef, 3)
 
-  ## convert the pedigree array from Float64 to Int and append the header to the file
-  ## For Pedigree file IDs, Sires and Dams must be string in format
+## convert the pedigree array from Float64 to Int and append the header to the file
+## For Pedigree file IDs, Sires and Dams must be string in format
 
   f = (x) -> Int(x);
   @time for i in 1:ped_size
@@ -21,7 +21,7 @@ function ped_ssbr_convert_1(pedfile)
           end
       end
 
-  # this converts "[1, 2, 3]" to "1, 2, 3"
+# this converts "[1, 2, 3]" to "1, 2, 3"
       ped_Array[i + 1] = z
   end
   return ped_Array
