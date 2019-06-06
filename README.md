@@ -12,3 +12,18 @@ For genomic estimated breeding value(EBV) and Genome wide association studies(GW
 
 ## Jupyter-Examples.
 Usage of XSimPreProcess module for SSBR-analysis in this folder
+
+## Updated Commandline Implementation 
+ARGS = 5 
+ARG[1] = Input Genotype Path
+ARG[2] = Processed Data Path
+ARG[3] = Analysis Data Path 
+ARG[4] = Number of QTL to set for analysis 
+ARG[5] = Number of Markers to include for Phenotype Simulation 
+
+1. Make 3 Directories - 1 for input data, 1 for processed data, 1 for analysis 
+2. Files inside Input Data -  Genotype file, XSim-Map-File
+3. Files inside Processed Data - Processed genotype, phenotype, pedigree, mapfile, rowIDs and other files as per pre-processing script 
+4. Files inside Analysis Data - Output files of JWAS run 
+5. Run command as follows ```julia Phenotype-SSBR-Simulation.jl .\Directory1// .\Directory2// .\Directory3// 5 1
+
