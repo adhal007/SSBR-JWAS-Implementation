@@ -15,6 +15,7 @@ Usage of XSimPreProcess module for SSBR-analysis in this folder
 
 ## Updated Commandline Implementation 
 ARGS = 5 
+
 ARG[1] = Input Genotype Path
 ARG[2] = Processed Data Path
 ARG[3] = Analysis Data Path 
