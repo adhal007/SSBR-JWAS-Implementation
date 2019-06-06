@@ -26,5 +26,5 @@ ARG[5] = Number of Markers to include for Phenotype Simulation
 2. Files inside Input Data -  Genotype file, XSim-Map-File
 3. Files inside Processed Data - Processed genotype, phenotype, pedigree, mapfile, rowIDs and other files as per pre-processing script 
 4. Files inside Analysis Data - Output files of JWAS run 
-5. Run command as follows ```julia Phenotype-SSBR-Simulation.jl .\Directory1// .\Directory2// .\Directory3// 5 1
+5. Run command as follows ```julia Phenotype-SSBR-Simulation.jl .\Directory1// .\Directory2// .\Directory3// 5 1 ```
 
