@@ -33,12 +33,10 @@ function test_split(y::Vector{Float64}, g::Matrix{Int64}, ped::Matrix{Int64})
 
     y_SSBR = y[pheno_ind]
     y_BR = y[geno_ind_ssbr]
-    ped_SSBR = ped
-    ped_BR = ped
     g_SSBR = g[geno_ind_ssbr, :];
     g_BR = g[geno_ind_ssbr, :];
 
-    return y_SSBR, ped_SSBR, g_SSBR, y_BR, ped_BR, g_BR, geno_ind_ssbr
+    return y_SSBR, g_SSBR, y_BR,  g_BR, geno_ind_ssbr
 end
 
 ###########################################################################################
