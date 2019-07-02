@@ -295,7 +295,7 @@ writedlm(pheno_process_out, pheno_processed);
 close(pheno_process_out)
  
 ## pre-process genotype IDs and pre-process genotype
-geno_ssbr_IDs = geno_row_IDs(ped_out_1);
+geno_ssbr_IDs = geno_row_IDs(ped_out_1, geno_ind_ssbr);
 geno_out = geno_ssbr_format(geno_ssbr, geno_ssbr_IDs);
 println(size(geno_out, 1))
 geno_name = open(procpath*"geno_processed.txt", "w");
