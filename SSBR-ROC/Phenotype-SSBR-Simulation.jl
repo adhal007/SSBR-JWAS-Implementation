@@ -21,11 +21,8 @@ using DelimitedFiles, JWAS, JWAS.misc, CSV, Distributions, LinearAlgebra, DataFr
 using Pkg
 function test_split(y::Vector{Float64}, g::Matrix{Int64}, ped::Matrix{Int64})
     ## Create Phenotype and Genotype for BayesC and Single Step 
-
-    rows_t = length(y);
- 
-    geno_ind_ssbr = vcat(rand(collect(5600:8400), 600), rand(collect(8401:11200),600), rand(collect(11201:14000), 300));
-   
+    rows_t = length(y)
+    geno_ind_ssbr = vcat(rand(collect(5600:8400), 600), rand(collect(8401:11200),600), rand(collect(11201:14000), 300))
     pheno_ind = collect(1:rows_t);
     println(geno_ind_ssbr)
     println("space")
@@ -35,99 +32,66 @@ function test_split(y::Vector{Float64}, g::Matrix{Int64}, ped::Matrix{Int64})
     y_BR = y[geno_ind_ssbr]
     g_SSBR = g[geno_ind_ssbr, :];
     g_BR = g[geno_ind_ssbr, :];
-
     return y_SSBR, g_SSBR, y_BR,  g_BR, geno_ind_ssbr
 end
 
-###########################################################################################
-## GENOTYPE FILE FORMATTING
+## Pre-Process Pedigree file Ip: "[1, 2, 3]" to "1,2,3"
+function ped_ssbr_process(pedfile)
+  ped_size = size(pedfile, 1)
+  ped_Array = Array{String}(undef, ped_size + 1);
+  ped_Array[1] = "ID,Sire,Dam";
+  temp_arr = Array{String}(undef, 3)
+  f = (x) -> Int(x);
+  @time for i in 1:ped_size
+      y = pedfile[i, :]
+      y = f.(y)
+      y = string(y)
+      z = ""
+      s = split(y, "")
+      l = length(s)
+      for j in 1:length(s)
+          if j !== 1 && j !== length(s) && y[j] !== ' '
+           z = z*y[j]
+          end
+      end
 
-function geno_ssbr_format(genofile, rowIDs)
-    geno_copy = genofile
- 
-    n_obs, n_markers = size(genofile)
-
-    ## hcat rowIDs
-    geno_cat1 = Array{Any}(undef, n_obs+1, n_markers+1);
-    geno_cat1[2:(n_obs+1), :] = hcat(rowIDs, geno_copy)
-    println("genotype file concatenated with ID's: ", "a1, 1, 0, 2")
-
-    ## add markerIDs and vcat
-    empty_l = Array{String}(undef, n_markers)
-    empty_l[1] = "ID"
-    empty_l[2:n_markers] = repeat(["m"], n_markers-1)
-
-    for i in 2:n_markers
-        empty_l[i] = empty_l[i] * "$(i-1)"
-    end
-
-    len = n_markers-1
-    println("$len markerIDs created")
-    ## Header split for genotype file
-    H_split = ""
-    for j in 1:n_markers
-        H_split = H_split*empty_l[j]
-        if j == n_markers
-            H_split = H_split
-        else
-            H_split = H_split*","
-        end
-    end
-    println("markerIDs split into:", "ID, m1, m2, m3", H_split )
-    ## return the H_split for 1st column of geno_formatted
-
-
-    ## Main split for genotype file 
-    f = x -> Int(x);
-    geno_string = Array{String}(undef, n_obs+1);
-    @time for j in 2:n_obs+1
-        v = geno_cat1[j, 2:end]
-        #println(v)
-        v = f.(v)
-        v = string(v)
-        v = split(v, "")
-        len = length(v)
-        z = ""
-        for i in 1:len
-            if i !== 1 && i !== 2 && i !== 3 && i !== len
-                z = z*v[i]
-            end
-        end
-        geno_string[j] = rowIDs[j-1]*","*z
-    end
-    println("Matrix split into", "a1, 0, 1, 2")
-    geno_string[1] = H_split
-    return  geno_string
+# this converts "[1, 2, 3]" to "1,2,3"
+      ped_Array[i + 1] = z
+  end
+ ped_size = size(ped_Array, 1)
+new_Arr = Array{String}(undef, ped_size);
+for j in 2:ped_size
+	x = split(string(ped_Array[j]), ",")
+	x = "a" .* x
+	#println(x)
+	new_Arr[j] = x[1]*","*x[2]*","*x[3]
+end
+new_Arr[1] = "ID,sire,dam"
+   return new_Arr
 end
 
 ##################################################################################
 ## rowID extraction for phenotype and genotypes is different
-function geno_row_IDs(genofile, pedfile)
-    if isa(genofile, String) == true         
-        genofile = readdlm(genofile);
-    else
-        genofile = genofile;
-    end
-    if isa(pedfile, String) == true         
-        pedfile = readdlm(pedfile);
-    else
-        pedfile=pedfile;
-    end
-    no_rows = size(genofile, 1) + 1
-    rowIDs = Array{Any}(undef, no_rows);
-    rowIDs[2:end] = pedfile[1:(no_rows-1), 1];
-    rowIDs[1] = "ID";
-    f = (x) -> Int(x);
-    for i in 2:no_rows
-        rowIDs[i] = f.(rowIDs[i])
-    end
-
-    for j in 2:no_rows
-        rowIDs[j] = "a"*string(rowIDs[j])
-    end
-    #iter_size = no_rows
-    return rowIDs[2:end]
+## Using only 1 function for obtaining phenotype IDs
+function pheno_row_IDs(ped_Array)
+	final_ids = Array{String}(undef, size(ped_Array,1)-1) ## since 1st row is "ID,Sire,Dam")
+	ID_list = split.(ped_Array)
+	for i in 1:size(ped_Array,1)-1
+	     final_ids[i] = ID_list[i][1]
+	end
+	return final_ids
 end
+
+function geno_row_IDs(ped_Array, geno_ind_ssbr)
+    	final_ids = Array{String}(undef, geno_ind_ssbr); ## since 1st row is "ID,Sire,Dam")
+	ped_Array = ped_Array[2:end];
+	ID_list = split.(ped_Array[geno_ind_ssbr, 1])
+	for i in 1:size(ped_Array,1)
+	     final_ids[i] = ID_list[i][1]
+	end
+	return final_ids
+end
+
 ## give a string path to the raw mapfile input generated by XSim
 function process_map(rawmapfile, nmarkers)
     mapfile = readdlm(rawmapfile)
@@ -164,80 +128,64 @@ function process_map(rawmapfile, nmarkers)
     return new_map
 end
 
-## Pre-Process Pedigree file with 2 functions
 
-function ped_ssbr_convert_1(pedfile)
-  ped_size = size(pedfile, 1)
-  ped_Array = Array{String}(undef, ped_size + 1);
-  ped_Array[1] = "ID,Sire,Dam";
-  temp_arr = Array{String}(undef, 3)
-  f = (x) -> Int(x);
-  @time for i in 1:ped_size
-      y = pedfile[i, :]
-      y = f.(y)
-      y = string(y)
-      z = ""
-      s = split(y, "")
-      l = length(s)
-      for j in 1:length(s)
-          if j !== 1 && j !== length(s) && y[j] !== ' '
-           z = z*y[j]
-          end
-      end
 
-# this converts "[1, 2, 3]" to "1, 2, 3"
-      ped_Array[i + 1] = z
-  end
-  return ped_Array
-end
+###########################################################################################
+## GENOTYPE FILE FORMATTING
+function geno_ssbr_format(genofile, rowIDs)
+    geno_copy = genofile
+    n_obs, n_markers = size(genofile)
+    n_obs += 1
+    n_markers += 1
+    ## hcat rowIDs
+    geno_cat1 = Array{Any}(undef, n_obs, n_markers);
+    geno_cat1[2:end, :] = hcat(rowIDs, geno_copy)
+    println("genotype file concatenated with ID's: ", "a1, 1, 0, 2")
 
-function ped_ssbr_append_char(ped_Array)
-    ped_size = size(ped_Array, 1)
-    new_Arr = Array{String}(undef, ped_size);
+    ## add markerIDs and vcat
+    empty_l = Array{String}(undef, n_markers)
+    empty_l[1] = "ID"
+    empty_l[2:end] = repeat(["m"], n_markers-1)
 
-    for j in 2:ped_size
-        x = split(string(ped_Array[j]), ",")
-        x = "a" .* x
-        #println(x)
-        new_Arr[j] = x[1]*","*x[2]*","*x[3]
-    end
-    new_Arr[1] = "ID,sire,dam"
-    return new_Arr
-end
-
-## Using only 1 function for obtaining phenotype IDs
-function pheno_row_IDs_train(phenofile, pedfile)
-    no_rows = size(phenofile, 1)
-    rowIDs = Array{Any}(undef, no_rows);
-    rowIDs[2:end] = pedfile[1:(no_rows)-1, 1];
-    rowIDs[1] = "ID";
-    f = (x) -> Int(x);
-    for i in 2:no_rows
-        rowIDs[i] = f.(rowIDs[i])
+    for i in 2:n_markers
+        empty_l[i] = empty_l[i] * "$(i-1)"
     end
 
-    for j in 2:no_rows
-        rowIDs[j] = "a"*string(rowIDs[j])
+    len = n_markers-1
+    println("$len markerIDs created")
+    ## Header split for genotype file
+    H_split = ""
+    for j in 1:n_markers
+        H_split = H_split*empty_l[j]
+        if j == n_markers
+            H_split = H_split
+        else
+            H_split = H_split*","
+        end
     end
-    #iter_size = no_rows
-    return rowIDs[2:end]
-end
-
-function pheno_row_IDs_test(phenofile, pedfile)
-    no_rows = size(phenofile, 1)
-    rowIDs = Array{Any}(undef, no_rows);
-    rowIDs[2:end] = pedfile[1:(no_rows)-1, 1];
-    rowIDs[1] = "ID";
-    f = (x) -> Int(x);
-    for i in 2:no_rows
-        rowIDs[i] = f.(rowIDs[i])
+    println("markerIDs split into:", "ID, m1, m2, m3", H_split )
+    ## return the H_split for 1st column of geno_formatte
+    ## Main split for genotype file 
+    f = x -> Int(x);
+    geno_string = Array{String}(undef, n_obs);
+    @time for j in 2:n_obs
+        v = geno_cat1[j, 2:end]
+        #println(v)
+        v = f.(v)
+        v = string(v)
+        v = split(v, "")
+        len = length(v)
+        z = ""
+        for i in 1:len
+            if i !== 1 && i !== 2 && i !== 3 && i !== len
+                z = z*v[i]
+            end
+        end
+        geno_string[j] = rowIDs[j-1]*","*z
     end
-
-    for j in 2:no_rows
-        rowIDs[j] = "a"*string(rowIDs[j])
-    end
-    #iter_size = no_rows
-    return rowIDs[2:end]
+    println("Matrix split into", "a1, 0, 1, 2")
+    geno_string[1] = H_split
+    return  geno_string
 end
 
 ######################################################################################
@@ -250,19 +198,19 @@ function pheno_ssbr_format(phenofile, rowIDs)
     else
         phenofile = phenofile;
         end 
-    nrows = length(phenofile) - 1
+    nrows = length(phenofile)
     ## concatenate the rowIDs
     pheno_cat = hcat(rowIDs, phenofile[2:end])
-    pheno_array = Array{String}(undef, nrows+1)
+    pheno_array = Array{String}(undef, nrows)
     pheno_array[1] = "ID,y"
-    for j in 2:(nrows+1)
+    for j in 2:nrows
         m1 = pheno_cat[j-1, 2];
         m2 = string(m1);
-
         pheno_array[j] = pheno_cat[j-1, 1]*","*m2
     end
     return pheno_array
 end
+
 ########################################################################################
 ## End of Functions for Processing Genotype, IDs, Phenotype, Pedigree and chromosome map
 ########################################################################################
@@ -287,7 +235,7 @@ fQTL = open(geno_path*"QTLpositions.txt", "w");
 writedlm(fQTL, QTLpos)
 close(fQTL)
 
-
+## Simulate Breeding values
 BV = Mfull[:,QTLpos]*QTL_effects
 BV = BV/std(BV)*sqrt(varg)
 vare = (1-h2)/h2*varg
@@ -318,7 +266,7 @@ close(f_var)
 
 
 ## Get Phenotypes for SSBR and BR for same set of genotypes
-pheno_ssbr, ped_ssbr, geno_ssbr, pheno_br, ped_br, geno_br, geno_ind_ssbr = test_split(Float64.(pheno), Int.(Mfull[:,1:nMarkers]), Int.(Ped));
+pheno_ssbr,  geno_ssbr, pheno_br, geno_br, geno_ind_ssbr = test_split(Float64.(pheno), Int.(Mfull[:,1:nMarkers]), Int.(Ped));
 
 ## Save raw phenotypes for SSBR
 Phenotypes = DataFrame();
@@ -326,32 +274,28 @@ Phenotypes[:y] = pheno_ssbr;
 CSV.write(procpath*"pheno_ssbr.txt", Phenotypes)
 
 ## preprocess and save pedigree file
-ped_out_1 = ped_ssbr_convert_1(Ped);
-ped_out = ped_ssbr_append_char(ped_out_1);
+ped_out_1 = ped_ssbr_process(Ped);
 ped_out_process = open(procpath*"pedigree_processed.txt", "w");
-writedlm(ped_out_process, ped_out);
+writedlm(ped_out_process, ped_out_1);
 close(ped_out_process)
 
 ## pre-process ObsID for phenotypes
-obs_ID = pheno_row_IDs_test(pheno_ssbr, ped_ssbr);
+obs_ID = pheno_row_IDs(ped_out_1);
 println(size(obs_ID, 1))
 obs_out = open(procpath*"Obs_ID.txt", "w")
 writedlm(obs_out, obs_ID)
 close(obs_out)
 
-## get genotype pre-processed
-pheno_ssbr = readdlm(procpath*"pheno_ssbr.txt")
-pheno_ssbr_IDs = pheno_row_IDs_train(pheno_ssbr, ped_ssbr);
-pheno_processed = pheno_ssbr_format(pheno_ssbr, pheno_ssbr_IDs);
-println(size(pheno_processed, 1))
-
 ## pre-process phenotype
+pheno_ssbr = readdlm(procpath*"pheno_ssbr.txt")
+pheno_processed = pheno_ssbr_format(pheno_ssbr, obs_ID);
+println(size(pheno_processed, 1))
 pheno_process_out = open(procpath*"pheno_processed.txt", "w");
 writedlm(pheno_process_out, pheno_processed);
 close(pheno_process_out)
  
 ## pre-process genotype IDs and pre-process genotype
-geno_ssbr_IDs = geno_row_IDs(geno_ssbr, ped_ssbr);
+geno_ssbr_IDs = geno_row_IDs(ped_out_1);
 geno_out = geno_ssbr_format(geno_ssbr, geno_ssbr_IDs);
 println(size(geno_out, 1))
 geno_name = open(procpath*"geno_processed.txt", "w");
