@@ -86,7 +86,7 @@ function geno_row_IDs(ped_Array, geno_ind_ssbr)
     	final_ids = Array{String}(undef, size(geno_ind_ssbr,1)); ## since 1st row is "ID,Sire,Dam")
 	ped_Array = ped_Array[2:end];
 	ID_list = split.(ped_Array[geno_ind_ssbr, 1])
-	for i in 1:size(ped_Array,1)
+	for i in 1:size(ped_Array,1)-1
 	     final_ids[i] = ID_list[i][1]
 	end
 	return final_ids
