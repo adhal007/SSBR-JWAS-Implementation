@@ -141,16 +141,14 @@ function geno_ssbr_format(genofile, rowIDs)
     geno_cat1 = Array{Any}(undef, n_obs, n_markers);
     geno_cat1[2:end, :] = hcat(rowIDs, geno_copy)
     println("genotype file concatenated with ID's: ", "a1, 1, 0, 2")
-
     ## add markerIDs and vcat
     empty_l = Array{String}(undef, n_markers)
     empty_l[1] = "ID"
     empty_l[2:end] = repeat(["m"], n_markers-1)
-
+    
     for i in 2:n_markers
         empty_l[i] = empty_l[i] * "$(i-1)"
     end
-
     len = n_markers-1
     println("$len markerIDs created")
     ## Header split for genotype file
@@ -170,18 +168,24 @@ function geno_ssbr_format(genofile, rowIDs)
     geno_string = Array{String}(undef, n_obs);
     @time for j in 2:n_obs
         v = geno_cat1[j, 2:end]
-        #println(v)
+        println()
+        println(v)
         v = f.(v)
         v = string(v)
         v = split(v, "")
+        println(v)
         len = length(v)
+        println()
+        println(len)
         z = ""
-        for i in 1:len
-            if i !== 1 && i !== 2 && i !== 3 && i !== len
-                z = z*v[i]
+        for i in 2:3:len-1
+            if i !== len-1
+                z = z*","*v[i]
+            else
+                z = z
             end
         end
-        geno_string[j] = rowIDs[j-1]*","*z
+        geno_string[j] = rowIDs[j-1]*z
     end
     println("Matrix split into", "a1, 0, 1, 2")
     geno_string[1] = H_split
