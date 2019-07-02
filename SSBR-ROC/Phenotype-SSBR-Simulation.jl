@@ -142,11 +142,11 @@ function geno_ssbr_format(genofile, rowIDs)
     geno_cat1[2:end, :] = hcat(rowIDs, geno_copy)
     println("genotype file concatenated with ID's: ", "a1, 1, 0, 2")
     ## add markerIDs and vcat
-    empty_l = Array{String}(undef, n_markers)
+    empty_l = Array{String}(undef, n_markers-1)
     empty_l[1] = "ID"
-    empty_l[2:end] = repeat(["m"], n_markers-1)
+    empty_l[2:end] = repeat(["m"], n_markers-2)
     
-    for i in 2:n_markers
+    for i in 2:n_markers-1
         empty_l[i] = empty_l[i] * "$(i-1)"
     end
     len = n_markers-1
