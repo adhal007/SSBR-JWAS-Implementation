@@ -54,7 +54,7 @@ end
 ## Using only 1 function for obtaining phenotype IDs
 function pheno_row_IDs(ped_Array)
 	final_ids = Array{String}(undef, size(ped_Array,1)-1) ## since 1st row is "ID,Sire,Dam")
-	ID_list = split.(ped_Array)
+	ID_list = split.(ped_Array, ",")
 	for i in 1:size(ped_Array,1)-1
 	     final_ids[i] = ID_list[i][1]
 	end
